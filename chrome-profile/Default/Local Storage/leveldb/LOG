@@ -1,0 +1,15 @@
+2026/06/10-11:27:40.237 4e0c Reusing MANIFEST C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/10-11:27:40.242 4e0c Recovering log #60
+2026/06/10-11:27:40.341 4e0c Reusing old log C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/000060.log 
+2026/06/10-11:27:56.989 6210 Level-0 table #64: started
+2026/06/10-11:27:56.993 6210 Level-0 table #64: 14298 bytes OK
+2026/06/10-11:27:56.995 6210 Delete type=0 #60
+2026/06/10-11:27:56.996 6210 Compacting 4@0 + 1@1 files
+2026/06/10-11:27:57.001 6210 Generated table #65@0: 127 keys, 11688 bytes
+2026/06/10-11:27:57.001 6210 Compacted 4@0 + 1@1 files => 11688 bytes
+2026/06/10-11:27:57.002 6210 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/06/10-11:27:57.003 6210 Delete type=2 #52
+2026/06/10-11:27:57.003 6210 Delete type=2 #55
+2026/06/10-11:27:57.003 6210 Delete type=2 #58
+2026/06/10-11:27:57.003 6210 Delete type=2 #61
+2026/06/10-11:27:57.003 6210 Delete type=2 #64
