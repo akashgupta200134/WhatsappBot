@@ -1,3 +1,24 @@
-2026/06/10-11:25:39.536 37ac Reusing MANIFEST C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/MANIFEST-000001
-2026/06/10-11:25:39.545 37ac Recovering log #60
-2026/06/10-11:25:39.549 37ac Reusing old log C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/000060.log 
+2026/06/13-16:02:36.715 5a38 Reusing MANIFEST C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/06/13-16:02:36.725 5a38 Recovering log #95
+2026/06/13-16:02:36.727 5a38 Reusing old log C:\Users\Akash\Desktop\WhatsappBot\chrome-profile\Default\Local Storage\leveldb/000095.log 
+2026/06/13-16:05:10.767 674 Level-0 table #99: started
+2026/06/13-16:05:10.772 674 Level-0 table #99: 16817 bytes OK
+2026/06/13-16:05:10.774 674 Delete type=0 #95
+2026/06/13-16:05:10.776 674 Compacting 4@0 + 1@1 files
+2026/06/13-16:05:10.780 674 Generated table #100@0: 200 keys, 11989 bytes
+2026/06/13-16:05:10.780 674 Compacted 4@0 + 1@1 files => 11989 bytes
+2026/06/13-16:05:10.781 674 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/06/13-16:05:10.782 674 Delete type=2 #89
+2026/06/13-16:05:10.782 674 Delete type=2 #91
+2026/06/13-16:05:10.782 674 Delete type=2 #93
+2026/06/13-16:05:10.782 674 Delete type=2 #96
+2026/06/13-16:05:10.782 674 Delete type=2 #99
+2026/06/13-16:08:17.862 674 Level-0 table #102: started
+2026/06/13-16:08:17.925 674 Level-0 table #102: 17913 bytes OK
+2026/06/13-16:08:17.927 674 Delete type=0 #98
+2026/06/13-16:11:18.516 674 Level-0 table #104: started
+2026/06/13-16:11:18.521 674 Level-0 table #104: 16558 bytes OK
+2026/06/13-16:11:18.523 674 Delete type=0 #101
+2026/06/13-16:13:37.673 674 Level-0 table #106: started
+2026/06/13-16:13:37.679 674 Level-0 table #106: 16414 bytes OK
+2026/06/13-16:13:37.682 674 Delete type=0 #103

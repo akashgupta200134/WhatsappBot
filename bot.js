@@ -13,7 +13,7 @@ const path         = require('path');
 const CONFIG = {
 
   EXCEL_FILE     : 'C:\\Users\\Akash\\Desktop\\WhatsappBot\\Copy of contactsDemo-Mainsheet_Macro.xlsx',
-  IMAGE_FILE     : 'C:\\Users\\Akash\\Desktop\\WhatsappBot\\INDIA BANNER.jpg',
+  IMAGE_FILE     : 'C:\\Users\\Akash\\Desktop\\WhatsappBot\\image.jpeg',
   LOG_FILE       : 'C:\\Users\\Akash\\Desktop\\WhatsappBot\\log.txt',
   CHROME_PROFILE : 'C:\\Users\\Akash\\Desktop\\WhatsappBot\\chrome-profile',
 
@@ -31,7 +31,7 @@ const CONFIG = {
   DELAY_AFTER_IMAGE      : 4000,
   DELAY_AFTER_MESSAGE    : 3000,
   WHATSAPP_LOAD_TIMEOUT  : 25000,
-  WA_READY_TIMEOUT       : 90000,
+  WA_READY_TIMEOUT       : 600000,  // 10 minutes — time to call, get OTP, and log in
 
   MESSAGE:`Hello 👋
 
@@ -650,9 +650,9 @@ async function main() {
   Logger.info('Launching Chrome...');
   if (!fs.existsSync(CONFIG.CHROME_PROFILE)) {
     fs.mkdirSync(CONFIG.CHROME_PROFILE, { recursive: true });
-    Logger.warn('First run — scan QR code. You have 90 seconds.');
+    Logger.warn('First run — no saved session. Complete login (OTP/QR) within 10 minutes.');
   } else {
-    Logger.info('Existing Chrome profile found — no QR scan needed.');
+    Logger.info('Existing Chrome profile found — checking if re-login is needed...');
   }
 
  // In your launchPersistentContext call, update args:
@@ -698,9 +698,11 @@ WA.context = await chromium.launchPersistentContext(
     } catch { /* ignore */ }
   }
 
-  Logger.info('Waiting for WhatsApp to be ready (up to 90s)...');
+  Logger.info('Waiting for WhatsApp to be ready (up to 10 minutes)...');
+  Logger.warn('ACTION NEEDED: If prompted, complete login via OTP or QR code in the browser window.');
   let waReady = false;
   const waDeadline = Date.now() + CONFIG.WA_READY_TIMEOUT;
+  let lastLoggedMinute = -1;
   while (Date.now() < waDeadline) {
     const found =
       await WA.page.$('[data-testid="chat-list-search"]').catch(() => null) ||   // search bar (older WA)
@@ -711,11 +713,19 @@ WA.context = await chromium.launchPersistentContext(
       await WA.page.$('div[contenteditable="true"][data-tab="3"]').catch(() => null); // old compose
 
     if (found) { waReady = true; break; }
+
+    // Log a reminder every minute so the console stays active
+    const minutesLeft = Math.ceil((waDeadline - Date.now()) / 60000);
+    if (minutesLeft !== lastLoggedMinute) {
+      lastLoggedMinute = minutesLeft;
+      Logger.info(`  Still waiting for login... ${minutesLeft} minute(s) remaining.`);
+    }
+
     await WA.page.waitForTimeout(1000);
   }
 
   if (!waReady) {
-    Logger.error('WhatsApp Web did not become ready. Scan QR or check internet.');
+    Logger.error('WhatsApp Web did not become ready within 10 minutes. Check login or internet.');
     await WA.context.close(); process.exit(1);
   }
   Logger.success('WhatsApp Web is ready.');
@@ -825,6 +835,3 @@ WA.context = await chromium.launchPersistentContext(
 }
 
 main();
-
-
-
