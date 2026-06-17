@@ -1,0 +1,118 @@
+
+this is my main flow
+
+SET AttachmentFolder TO $'''C:\\ABGT Eway Process PAD\\AttachmentFolder'''
+SET ProcessFolder TO $'''C:\\ABGT Eway Process PAD\\ProcessFolder'''
+SET FailedFolder TO $'''C:\\ABGT Eway Process PAD\\FailedFolder'''
+SET OutputFolder TO $'''C:\\ABGT Eway Process PAD\\OutputFolder'''
+SET ScriptFolder TO $'''C:\\ABGT Eway Process PAD\\ScriptFolder'''
+SET LogsFolder TO $'''C:\\ABGT Eway Process PAD\\LogsFolder'''
+SET ExcelFile TO $'''\"'''
+SET OutlookAccount TO $'''rpainvoice@ssiplglobal.com'''
+SET TempJosnFile TO $'''\"'''
+SET SubjectKeyword TO $'''Eway-'''
+CALL DownloadAttachments
+
+
+
+
+this is my download attachment Subflow
+
+Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''powershell -ExecutionPolicy Bypass -File \"%ScriptFolder%\\Downloademails.ps1\" -AttachmentsFolder \"%AttachmentFolder%\" -SubjectKeyword \"%SubjectKeyword%\" -OutlookAccount \"%OutlookAccount%\"''' WorkingDirectory: ScriptFolder StandardOutput=> CommandOutput StandardError=> CommandErrorOutput ExitCode=> CommandExitCode
+IF CommandExitCode <> 0 THEN
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+    File.WriteText File: $'''%LogsFolder%\\errors.log''' TextToWrite: $'''%CurrentDateTime% | DOWNLOAD_FAILED | EXIT:%CommandExitCode% | %CommandErrorOutput%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.UTF8
+END
+
+
+this is my download attachment script
+Scripts
+
+param(
+    [string]$AttachmentFolder,
+    [string]$SubjectKeyword,
+    [string]$OutlookAccount
+)
+
+# Connect to running Outlook instance or launch new one
+try {
+    $outlook = [Runtime.InteropServices.Marshal]::GetActiveObject("Outlook.Application")
+} catch {
+    $outlook = New-Object -ComObject Outlook.Application
+}
+
+$ns = $outlook.GetNamespace("MAPI")
+
+# Find the correct account inbox
+$inbox = $null
+foreach ($folder in $ns.Folders) {
+    if ($folder.Name -like "*$OutlookAccount*" -or $OutlookAccount -like "*$($folder.Name)*") {
+        try {
+            $inbox = $folder.Folders.Item("Inbox")
+            break
+        } catch { }
+    }
+}
+
+# Fallback to default inbox if account not matched
+if (-not $inbox) {
+    $inbox = $ns.GetDefaultFolder(6)
+}
+
+$count = 0
+
+# Loop all items in inbox
+foreach ($mail in @($inbox.Items)) {
+
+    # Only process unread MailItems (Class 43) with matching subject keyword
+    if ($mail.Class -ne 43) { continue }
+    if (-not $mail.UnRead) { continue }
+    if ($mail.Subject -notlike "*$SubjectKeyword*") { continue }
+    if ($mail.Subject -notmatch "DOC:") { continue }
+    if ($mail.Attachments.Count -eq 0) { continue }
+
+    $subject = $mail.Subject
+
+    foreach ($att in $mail.Attachments) {
+
+        $filename = $att.FileName
+
+        # Only process PDF attachments
+        if ($filename -notmatch "\.pdf$") { continue }
+
+        # Build safe paths using .NET Path.Combine
+        $savePath    = [System.IO.Path]::Combine($AttachmentFolder, $filename)
+        $subjectPath = $savePath + ".subject.txt"
+
+        # Save the PDF attachment to disk
+        $att.SaveAsFile($savePath)
+
+        # Write the email subject as sidecar file next to PDF
+        [System.IO.File]::WriteAllText($subjectPath, $subject, [System.Text.Encoding]::UTF8)
+
+        $count++
+    }
+
+    # Mark email as read so it is not picked up again next run
+    $mail.UnRead = $false
+    $mail.Save()
+}
+
+Write-Output "DOWNLOADED:$count"
+exit 0
+
+
+
+
+
+
+
+
+this is the error i AM GETTING Error
+
+Cannot save the attachment. You don't have appropriate permission to perform this operation.
+At C:\ABGT Eway Process PAD\ScriptFolder\Downloademails.ps1:58 char:9
++         $att.SaveAsFile($savePath)
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (:) [], UnauthorizedAccessException
+    + FullyQualifiedErrorId : System.UnauthorizedAccessException
